@@ -17,7 +17,7 @@
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="theme-color" content="#222222">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <title>Pokedolar</title>
 
 </head>
@@ -28,6 +28,7 @@
         padding: 0;
         overflow: hidden;
         box-sizing: border-box;
+        cursor: url('Pokeball.cur'), auto;
     }
 
     html {
@@ -35,11 +36,8 @@
     }
 
     .visor {
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        place-items: center;
         height: 100vh;
         width: 100vw;
 
@@ -52,6 +50,7 @@
         background-repeat: no-repeat;
         background-attachment: fixed;
         border: 3vmin solid #222;
+        position: relative;
     }
 
     img {
@@ -68,50 +67,95 @@
         bottom: 3vmin;
         right: calc(3vmin + 8px);
     }
+
+    .pokemon {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .alpha {
+        opacity: 0.3;
+    }
+
+
+    .pokeball {
+        width: 30vmin;
+        height: 30vmin;
+        overflow: hidden;
+        position: absolute;
+        display: none;
+        animation: swing 1000ms infinite;
+    }
+
+    .loading {
+        display: inline-block;
+    }
 </style>
 
 <body>
-    <div class="visor">
 
-        <span id="name"></span>
-        <img src='' alt="" />
+    <div class="visor">
+        <img class="pokeball animate__animated" src="pokeball.png" />
+        <div class="pokemon">
+            <span id="name"></span>
+            <img id="pokemon_sprite" src='' alt="" />
+        </div>
 
         <span id="date"></span>
     </div>
 </body>
 
+
+
 <script>
-    const image = document.querySelector('img');
+    const image = document.querySelector('#pokemon_sprite');
+    const visor = document.querySelector('.visor');
     const name_span = document.querySelector('#name');
     const date_span = document.querySelector('#date');
+    const pokeball_loading = document.querySelector('.pokeball');
+    const pokemon_div = document.querySelector('.pokemon');
 
-    fetch('https://economia.awesomeapi.com.br/json/daily/USD-BRL/1')
-        .then(async r => {
-            // console.log(await r);
-            const response = await r.text();
-            const dolar = JSON.parse(response)[0].bid
-            const date = JSON.parse(response)[0].create_date
-            const datetime = new Date(date)
-            const dolar_ajustado = Number(dolar) * 100;
-            const pokemon = parseInt(dolar_ajustado);
+    const getPokemonDolar = () => {
+        pokeball_loading.classList.add('loading');
+        pokemon_div.classList.add('alpha');
+
+        fetch('https://economia.awesomeapi.com.br/json/daily/USD-BRL/1')
+            .then(async r => {
+                // console.log(await r);
+                const response = await r.text();
+                const dolar = JSON.parse(response)[0].bid
+                const date = JSON.parse(response)[0].create_date
+                const datetime = new Date(date)
+                const dolar_ajustado = Number(dolar) * 100;
+                const pokemon = parseInt(dolar_ajustado);
 
 
-            fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
-                .then(async r => {
-                    const response = await r.text();
-                    const poke = JSON.parse(response)
-                    const name = poke.name
-                    const sprite = poke.sprites.other['official-artwork'].front_default
-                    image.src = sprite;
-                    image.alt = `imagem de ${name}`
-                    name_span.innerHTML = `#${pokemon} - ${name} (R$ ${dolar.slice(0, 4)})`;
-                    date_span.innerHTML = datetime.toLocaleString();
+                fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
+                    .then(async r => {
+                        const response = await r.text();
+                        const poke = JSON.parse(response)
+                        const name = poke.name
+                        const sprite = poke.sprites.other['official-artwork'].front_default
+                        image.src = sprite;
+                        image.alt = `imagem de ${name}`
+                        image.title = `${name}`
+                        name_span.innerHTML = `#${pokemon} - ${name} (R$ ${dolar.slice(0, 4)})`;
+                        date_span.innerHTML = datetime.toLocaleString();
+                        pokemon_div.classList.remove('alpha');
+                        pokeball_loading.classList.remove('loading');
 
-                })
-                .catch(e => console.error('Boo...' + e));
+                    })
+                    .catch(e => console.error('Boo...' + e));
 
-        })
-        .catch(e => console.error('Boo...' + e));
+            })
+            .catch(e => console.error('Boo...' + e));
+    }
+    getPokemonDolar();
+
+    visor.addEventListener('click', getPokemonDolar)
+
 
 </script>
 
