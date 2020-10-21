@@ -89,7 +89,7 @@
         .then(async r => {
             // console.log(await r);
             const response = await r.text();
-            const dolar = JSON.parse(response)[0].ask
+            const dolar = JSON.parse(response)[0].bid
             const date = JSON.parse(response)[0].create_date
             const datetime = new Date(date)
             const dolar_ajustado = Number(dolar) * 100;
