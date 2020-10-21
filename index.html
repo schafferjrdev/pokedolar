@@ -75,8 +75,8 @@
         align-items: center;
     }
 
-    .alpha {
-        opacity: 0.3;
+    .hidden {
+        display: none;
     }
 
 
@@ -86,7 +86,7 @@
         overflow: hidden;
         position: absolute;
         display: none;
-        animation: swing 1000ms infinite;
+        animation: swing 800ms infinite;
     }
 
     .loading {
@@ -119,38 +119,43 @@
 
     const getPokemonDolar = () => {
         pokeball_loading.classList.add('loading');
-        pokemon_div.classList.add('alpha');
+        pokemon_div.classList.add('hidden');
 
-        fetch('https://economia.awesomeapi.com.br/json/daily/USD-BRL/1')
-            .then(async r => {
-                // console.log(await r);
-                const response = await r.text();
-                const dolar = JSON.parse(response)[0].bid
-                const date = JSON.parse(response)[0].create_date
-                const datetime = new Date(date)
-                const dolar_ajustado = Number(dolar) * 100;
-                const pokemon = parseInt(dolar_ajustado);
+        setTimeout(() => {
+            fetch('https://economia.awesomeapi.com.br/json/daily/USD-BRL/1')
+                .then(async r => {
+                    // console.log(await r);
+                    const response = await r.text();
+                    const dolar = JSON.parse(response)[0].bid
+                    const date = JSON.parse(response)[0].create_date
+                    const datetime = new Date(date)
+                    const dolar_ajustado = Number(dolar) * 100;
+                    const pokemon = parseInt(dolar_ajustado);
 
 
-                fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
-                    .then(async r => {
-                        const response = await r.text();
-                        const poke = JSON.parse(response)
-                        const name = poke.name
-                        const sprite = poke.sprites.other['official-artwork'].front_default
-                        image.src = sprite;
-                        image.alt = `imagem de ${name}`
-                        image.title = `${name}`
-                        name_span.innerHTML = `#${pokemon} - ${name} (R$ ${dolar.slice(0, 4)})`;
-                        date_span.innerHTML = datetime.toLocaleString();
-                        pokemon_div.classList.remove('alpha');
-                        pokeball_loading.classList.remove('loading');
+                    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
+                        .then(async r => {
+                            const response = await r.text();
+                            const poke = JSON.parse(response)
+                            const name = poke.name
+                            const sprite = poke.sprites.other['official-artwork'].front_default
+                            image.src = sprite;
+                            image.alt = `imagem de ${name}`
+                            image.title = `${name}`
+                            name_span.innerHTML = `#${pokemon} - ${name} (R$ ${dolar.slice(0, 4)})`;
+                            date_span.innerHTML = datetime.toLocaleString();
+                            pokemon_div.classList.remove('hidden');
+                            pokeball_loading.classList.remove('loading');
 
-                    })
-                    .catch(e => console.error('Boo...' + e));
+                        })
+                        .catch(e => console.error('Boo...' + e));
 
-            })
-            .catch(e => console.error('Boo...' + e));
+                })
+                .catch(e => console.error('Boo...' + e));
+        }, 1000);
+
+
+
     }
     getPokemonDolar();
 
