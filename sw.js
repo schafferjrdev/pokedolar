@@ -5,8 +5,6 @@
 // VOCÊ VAI ADICIONAR AS COISAS QUE TEM QUE SER SALVAS ASSIM QUE O CARA ABRIR O APP NA PRIMEIRA VEZ NA VIDA [SCHAFFER]
 const CACHE = "pwabuilder-precache";
 const precacheFiles = [
-  "./",
-  "/assets",
   "/assets/images/pokeball.png",
   "/assets/images/Pokeball.cur",
   "/assets/css/style.css",
