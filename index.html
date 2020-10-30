@@ -122,13 +122,14 @@
         pokemon_div.classList.add('hidden');
 
         setTimeout(() => {
-            fetch('https://economia.awesomeapi.com.br/json/daily/USD-BRL/1')
+            fetch('https://api.exchangeratesapi.io/latest?base=USD&symbols=BRL')
                 .then(async r => {
-                    // console.log(await r);
                     const response = await r.text();
-                    const dolar = JSON.parse(response)[0].bid
-                    const date = JSON.parse(response)[0].create_date
-                    const datetime = new Date(date)
+                    const obj = JSON.parse(response)
+                    const dolar = obj.rates.BRL
+                    const date = obj.date
+                    const [year, month, day] = date.split('-')
+                    const datetime = `${day}/${month}/${year}`
                     const dolar_ajustado = Number(dolar) * 100;
                     const pokemon = parseInt(dolar_ajustado);
 
@@ -142,8 +143,8 @@
                             image.src = sprite;
                             image.alt = `imagem de ${name}`
                             image.title = `${name}`
-                            name_span.innerHTML = `#${pokemon} - ${name} (R$ ${dolar.slice(0, 4)})`;
-                            date_span.innerHTML = datetime.toLocaleString();
+                            name_span.innerHTML = `#${pokemon} - ${name} (R$ ${pokemon / 100})`;
+                            date_span.innerHTML = datetime;
                             pokemon_div.classList.remove('hidden');
                             pokeball_loading.classList.remove('loading');
 
