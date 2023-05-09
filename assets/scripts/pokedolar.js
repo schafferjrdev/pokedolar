@@ -10,16 +10,28 @@ const getPokemonDolar = () => {
   pokemon_div.classList.add("hidden");
 
   setTimeout(() => {
-    fetch("https://api.exchangeratesapi.io/latest?base=USD&symbols=BRL")
+    fetch("https://economia.awesomeapi.com.br/last/USD-BRL")
       .then(async (r) => {
         const response = await r.text();
-        const obj = JSON.parse(response);
-        const dolar = obj.rates.BRL;
-        const date = obj.date;
-        const [year, month, day] = date.split("-");
-        const datetime = `${day}/${month}/${year}`;
-        const dolar_ajustado = Number(dolar) * 100;
+        const obj = JSON.parse(response).USDBRL;
+        const dolar = obj.bid;
+
+        let data = new Date(obj.create_date);
+
+        let dia = data.getDate().toString().padStart(2, "0");
+        let mes = (data.getMonth() + 1).toString().padStart(2, "0");
+        let ano = data.getFullYear().toString();
+        let hora = data.getHours().toString().padStart(2, "0");
+        let minutos = data.getMinutes().toString().padStart(2, "0");
+
+        let datetime = `${dia}/${mes}/${ano} às ${hora}:${minutos}`;
+
+        // const [year, month, day] = date.split("-");
+        // const datetime = `${day}/${month}/${year}`;
+
+        const dolar_ajustado = Number(dolar).toFixed(2) * 100;
         const pokemon = parseInt(dolar_ajustado);
+        console.log(pokemon, date, datetime);
 
         fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
           .then(async (r) => {
